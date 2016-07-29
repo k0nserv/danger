@@ -167,4 +167,55 @@ describe Danger::Helpers::CommentsHelper do
       end
     end
   end
+
+  describe "#generate_comment" do
+    it "produces the exepected coment" do
+      comment = dummy.generate_comment(
+        warnings: [Danger::Violation.new("This is a warning", false)],
+        errors: [Danger::Violation.new("This is an error", true)],
+        messages: [Danger::Violation.new("This is a message", false)],
+        markdowns: ["*Raw markdown*"],
+        danger_id: "my_danger_id",
+        template: "github"
+      )
+
+      expect(comment).to include('data-meta="generated_by_my_danger_id"')
+
+      expect(comment).to include('<td data-sticky="true">This is an error</td>')
+      expect(comment).to include("<td>:no_entry_sign:</td>")
+
+      expect(comment).to include('<td data-sticky="false">This is a warning</td>')
+      expect(comment).to include("<td>:warning:</td>")
+
+      expect(comment).to include('<td data-sticky="false">This is a message</td>')
+      expect(comment).to include("<td>:warning:</td>")
+
+      expect(comment).to include("*Raw markdown*")
+    end
+  end
+
+  describe "#generate_description" do
+    it "Handles no errors or warnings" do
+      message = dummy.generate_description(warnings: [], errors: [])
+      expect(message).to include("All green.")
+    end
+
+    it "handles a single error and a single warning" do
+      message = dummy.generate_description(warnings: [1], errors: [1])
+
+      expect(message).to include("⚠ ")
+      expect(message).to include("Error")
+      expect(message).to include("Warning")
+      expect(message).to include("Don't worry, everything is fixable.")
+    end
+
+    it "handles multiple errors and warning with pluralisation" do
+      message = dummy.generate_description(warnings: [1, 2], errors: [1, 2])
+
+      expect(message).to include("⚠ ")
+      expect(message).to include("Errors")
+      expect(message).to include("Warnings")
+      expect(message).to include("Don't worry, everything is fixable.")
+    end
+  end
 end
