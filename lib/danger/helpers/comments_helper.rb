@@ -1,3 +1,5 @@
+require "redcarpet"
+
 module Danger
   module Helpers
     module CommentsHelper

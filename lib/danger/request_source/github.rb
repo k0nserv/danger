@@ -1,6 +1,5 @@
 # coding: utf-8
 require 'octokit'
-require 'redcarpet'
 require 'danger/helpers/comments_helper'
 
 module Danger
